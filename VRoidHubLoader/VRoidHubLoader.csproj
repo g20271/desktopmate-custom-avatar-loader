@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>disable</Nullable>
+		<Nullable>enable</Nullable>
 		<RootNamespace>CustomAvatarLoader</RootNamespace>
 		<LangVersion>default</LangVersion>
 		<IsPackable>false</IsPackable>
@@ -422,6 +422,7 @@
 		<Compile Include="Helpers\AsyncHelper.cs" />
 		<Compile Include="Logging\ILogger.cs" />
 		<Compile Include="Logging\MelonLoaderLogger.cs" />
+		<Compile Include="Logging\PlayerLogManager.cs" />
 		<Compile Include="Modules\IModule.cs" />
 		<Compile Include="Modules\VrmLoaderModule.cs" />
 		<Compile Include="Settings\ISettingsProvider.cs" />

@@ -11,7 +11,7 @@ public interface ISettingsProvider
 
     T? Get<T>(string setting);
 
-    void Set<T>(string setting, T value);
+    T? Set<T>(string setting, T value);
 
     void SaveSettings();
 }

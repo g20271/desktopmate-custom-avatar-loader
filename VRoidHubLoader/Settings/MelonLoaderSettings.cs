@@ -13,24 +13,32 @@ public class MelonLoaderSettings : ISettingsProvider
 
     public T? Get<T>(string setting)
     {
-        if (string.IsNullOrEmpty(setting)) return default;
+        if (string.IsNullOrEmpty(setting))
+        {
+            return default;
+        }
         
-        String[] settingSections = setting.Split(".");
-        String category = settingSections.Length > 1 ? settingSections[0] : _defaultCategory;
-        String key = settingSections.Length > 1 ? settingSections[1] : settingSections[0];
+        var settingSections = setting.Split(".");
+        var category = settingSections.Length > 1 ? settingSections[0] : _defaultCategory;
+        var key = settingSections.Length > 1 ? settingSections[1] : settingSections[0];
         
         return MelonPreferences.CreateCategory(category).CreateEntry<T>(key, default).Value;
     }
 
-    public void Set<T>(string setting, T value)
+    public T? Set<T>(string setting, T value)
     {
-        if (string.IsNullOrEmpty(setting)) return;
+        if (string.IsNullOrEmpty(setting))
+        {
+            return default;
+        }
         
-        String[] settingSections = setting.Split(".");
-        String category = settingSections.Length > 1 ? settingSections[0] : _defaultCategory;
-        String key = settingSections.Length > 1 ? settingSections[1] : settingSections[0];
+        var settingSections = setting.Split(".");
+        var category = settingSections.Length > 1 ? settingSections[0] : _defaultCategory;
+        var key = settingSections.Length > 1 ? settingSections[1] : settingSections[0];
         
         MelonPreferences.CreateCategory(category).CreateEntry<T>(key, default).Value = value;
+
+        return value;
     }
 
     public void SaveSettings()
