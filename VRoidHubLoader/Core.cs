@@ -15,6 +15,7 @@ public class Core : MelonMod
     protected const string RepositoryName = "YusufOzmen01/desktopmate-custom-avatar-loader";
 
     protected virtual ILogger Logger { get; private set; }
+
     protected virtual ISettingsProvider SettingsProvider { get; private set; }
 
     protected virtual IServiceProvider ServiceProvider { get; private set; }
@@ -106,7 +107,7 @@ public class Core : MelonMod
     {
         services.AddSingleton(typeof(MelonLogger.Instance), LoggerInstance);
         services.AddSingleton(typeof(ISettingsProvider), new MelonLoaderSettings("settings"));
-        services.AddScoped(typeof(Logging.ILogger), typeof(MelonLoaderLogger));
+        services.AddScoped(typeof(ILogger), typeof(MelonLoaderLogger));
         services.AddScoped(typeof(IModule), typeof(VrmLoaderModule));
     }
 
