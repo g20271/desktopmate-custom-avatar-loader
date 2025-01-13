@@ -51,6 +51,8 @@ public class Core : MelonMod
         {
             Logger.Info("[VersionCheck] Latest version installed");
         }
+        
+        WindowHelper.SetWindowForeground(WindowHelper.GetUnityGameHwnd());
 
         foreach (var module in Modules)
         {

@@ -7,8 +7,6 @@ namespace CustomAvatarLoader.Helpers;
 
 public class WindowHelper
 {
-    ILogger _logger;
-    
     private delegate bool EnumThreadDelegate(IntPtr hWnd, IntPtr lParam);
     
     [DllImport("user32.dll")]
@@ -27,36 +25,30 @@ public class WindowHelper
     private const uint SC_MINIMIZE = 0xF020;
     private const uint SC_RESTORE = 0xF120;
 
-    public WindowHelper(ILogger logger)
-    {
-        _logger = logger;
-    }
-
-    public void MinimizeGameWindow(IntPtr hWnd)
+    public static void MinimizeGameWindow(IntPtr hWnd)
     {
         PostMessage(hWnd, WM_SYSCOMMAND,  (IntPtr) SC_MINIMIZE, (IntPtr) 0);
     }
 
-    public void UnminimizeGameWindow(IntPtr hWnd)
+    public static void UnminimizeGameWindow(IntPtr hWnd)
     {
         PostMessage(hWnd, WM_SYSCOMMAND,  (IntPtr) SC_RESTORE, (IntPtr) 0);
     }
     
-    public void SetWindowForeground(IntPtr hWnd)
+    public static void SetWindowForeground(IntPtr hWnd)
     {
         SetForegroundWindow(hWnd);
     }
 
-    public IntPtr GetUnityGameHwnd()
+    public static IntPtr GetUnityGameHwnd()
     {
-        IntPtr hWnd = IntPtr.Zero;
         foreach (Process pList in Process.GetProcesses())
         {
-            if (pList.MainWindowTitle.EndsWith("DesktopMate"))
+            if (pList.MainWindowTitle.StartsWith("DesktopMate"))
             {
-                hWnd = pList.MainWindowHandle;
+                return pList.MainWindowHandle;
             }
         }
-        return hWnd;
+        return IntPtr.Zero;
     }
 }
