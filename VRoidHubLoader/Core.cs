@@ -11,7 +11,7 @@ using Versioning;
 public class Core : MelonMod
 {
     protected const string RepositoryName = "YusufOzmen01/desktopmate-custom-avatar-loader";
-    
+
     protected virtual ILogger Logger { get; private set; }
 
     protected virtual IServiceProvider ServiceProvider { get; private set; }
@@ -36,7 +36,7 @@ public class Core : MelonMod
         {
             Logger.Warn("CurrentVersion is 0, faulty module version?");
         }
-        
+
         var hasLatestVersion = versionChecker.IsLatestVersionInstalled(currentVersion);
 
         if (!hasLatestVersion)

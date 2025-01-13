@@ -422,6 +422,8 @@
 		<Compile Include="Logging\MelonLoaderLogger.cs" />
 		<Compile Include="Modules\IModule.cs" />
 		<Compile Include="Modules\VrmLoaderModule.cs" />
+		<Compile Include="Settings\ISettingsProvider.cs" />
+		<Compile Include="Settings\MelonLoaderSettings.cs" />
 		<Compile Include="Versioning\GitHubTag.cs" />
 		<Compile Include="Versioning\GitHubVersionChecker.cs" />
 	</ItemGroup>
