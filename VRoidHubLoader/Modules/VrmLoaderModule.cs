@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using CustomAvatarLoader.Settings;
 
 namespace CustomAvatarLoader.Modules;
@@ -29,16 +29,18 @@ public class VrmLoaderModule : IModule
     protected virtual CharaData CharaData { get; set; }
 
     protected virtual RuntimeAnimatorController RuntimeAnimatorController { get; set; }
-    
+
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     private static extern int MessageBox(IntPtr hwnd, String text, String caption, uint type);
-
+    
+    protected virtual AsyncHelper AsyncHelper { get; set; }
+     
     public void OnInitialize()
     {
-        
+        AsyncHelper = new AsyncHelper();
     }
 
-    public void OnUpdate()
+    public async void OnUpdate()
     {
         if (!init)
         {
@@ -52,21 +54,25 @@ public class VrmLoaderModule : IModule
             init = true;
         }
 
+        AsyncHelper.OnUpdate();
+
         if (Input.GetKeyDown(KeyCode.F4))
         {
             Logger.Debug($"OnUpdate: VrmLoaderModule F4 pressed");
 
             var fileHelper = new FileHelper();
 
-            string path = fileHelper.OpenFileDialog();
+            string path = await fileHelper.OpenFileDialog();
 
-            if (!string.IsNullOrEmpty(path) && LoadCharacter(path))
-            {
-                SettingsProvider.Set("vrmPath", path);
-                MelonPreferences.Save();
+            AsyncHelper.RunOnMainThread(() => {
+                if (!string.IsNullOrEmpty(path) && LoadCharacter(path))
+                {
+                    SettingsProvider.Set("vrmPath", path);
+                    MelonPreferences.Save();
 
-                Logger.Debug($"OnUpdate: VrmLoaderModule file chosen");
-            }
+                    Logger.Debug($"OnUpdate: VrmLoaderModule file chosen");
+                }
+            });
         }
     }
 
