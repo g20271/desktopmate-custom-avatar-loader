@@ -51,9 +51,51 @@ public class Core : MelonMod
         {
             Logger.Info("[VersionCheck] Latest version installed");
         }
-        
+
         WindowHelper.SetWindowForeground(WindowHelper.GetUnityGameHwnd());
 
+        // Remove the contents of the log file and set it as readonly
+        bool disableReadOnly = MelonPreferences.CreateCategory("settings")
+            .CreateEntry<bool>("disable_log_readonly", false).Value;
+        
+        MelonPreferences.Save();
+        
+        string logPath = Path.Join(Environment.GetEnvironmentVariable("USERPROFILE"), "Appdata", "LocalLow",
+            "infiniteloop", "DesktopMate");
+
+        string playerLog = Path.Join(logPath, "Player.log");
+        string playerPrevLog = Path.Join(logPath, "Player-prev.log");
+
+        if (File.Exists(playerLog))
+        {
+            File.SetAttributes(playerLog, FileAttributes.Normal);
+            try
+            {
+                File.WriteAllText(playerLog, string.Empty);
+            }
+            catch
+            {
+                /* empty */
+            }
+
+            File.SetAttributes(playerLog, disableReadOnly ? FileAttributes.Normal : FileAttributes.ReadOnly);
+        }
+
+        if (File.Exists(playerPrevLog))
+        {
+            File.SetAttributes(playerPrevLog, FileAttributes.Normal);
+            try
+            {
+                File.WriteAllText(playerPrevLog, string.Empty);
+            }
+            catch
+            {
+                /* empty */
+            }
+
+            File.SetAttributes(playerPrevLog, disableReadOnly ? FileAttributes.Normal : FileAttributes.ReadOnly);
+        }
+        
         foreach (var module in Modules)
         {
             module.OnInitialize();
