@@ -1,4 +1,7 @@
-﻿namespace CustomAvatarLoader.Modules;
+﻿using System.Runtime.InteropServices;
+using CustomAvatarLoader.Settings;
+
+namespace CustomAvatarLoader.Modules;
 
 using CustomAvatarLoader.Helpers;
 using Il2Cpp;
@@ -10,36 +13,40 @@ public class VrmLoaderModule : IModule
 {
     private bool init;
 
-    public VrmLoaderModule(ILogger logger)
+    public VrmLoaderModule(ILogger logger, ISettingsProvider settingsProvider)
     {
         Logger = logger;
+        SettingsProvider = settingsProvider;
         VrmLoader = new VrmLoader(Logger);
     }
 
     protected virtual ILogger Logger { get; }
+    
+    protected virtual ISettingsProvider SettingsProvider { get; }
 
     protected virtual VrmLoader VrmLoader { get; }
 
     protected virtual CharaData CharaData { get; set; }
 
     protected virtual RuntimeAnimatorController RuntimeAnimatorController { get; set; }
-
-    private MelonPreferences_Entry<string> VrmPath { get; set; }
+    
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern int MessageBox(IntPtr hwnd, String text, String caption, uint type);
 
     public void OnInitialize()
     {
-        var settings = MelonPreferences.CreateCategory("settings");
-        VrmPath = settings.CreateEntry("vrmPath", "");
+        
     }
 
     public void OnUpdate()
     {
         if (!init)
         {
+            string vrmPath = SettingsProvider.Get<string>("vrmPath");
             if (GameObject.Find("/CharactersRoot")?.transform?.GetChild(0) != null
-                && VrmPath.Value != string.Empty)
+                && vrmPath != string.Empty)
             {
-                LoadCharacter(VrmPath.Value);
+                LoadCharacter(vrmPath);
             }
 
             init = true;
@@ -55,7 +62,7 @@ public class VrmLoaderModule : IModule
 
             if (!string.IsNullOrEmpty(path) && LoadCharacter(path))
             {
-                VrmPath.Value = path;
+                SettingsProvider.Set("vrmPath", path);
                 MelonPreferences.Save();
 
                 Logger.Debug($"OnUpdate: VrmLoaderModule file chosen");
@@ -68,6 +75,7 @@ public class VrmLoaderModule : IModule
         if (!File.Exists(path))
         {
             Logger.Error("[Chara Loader] VRM file does not exist: " + path);
+            
             return false;
         }
 
@@ -75,16 +83,19 @@ public class VrmLoaderModule : IModule
         CharaData = chara.GetComponent<CharaData>();
         RuntimeAnimatorController = chara.GetComponent<Animator>().runtimeAnimatorController;
 
-        Logger.Debug("Character attributes have been copied. Removing existing character...");
-        Object.Destroy(chara);
+        Logger.Debug("Character attributes have been copied!");
 
         GameObject newChara = VrmLoader.LoadVrmIntoScene(path);
         if (newChara == null)
         {
             Logger.Error("[Chara Loader] Failed to load VRM file: " + path);
+            MessageBox(new IntPtr(0), "Failed to load VRM file! Make sure the VRM file is compatible!", "Error", 0x00000010 /* MB_ICONERROR */);
 
             return false;
         }
+        
+        Logger.Debug("Old character has been destroyed.");
+        Object.Destroy(chara);
 
         newChara.transform.parent = GameObject.Find("/CharactersRoot").transform;
 

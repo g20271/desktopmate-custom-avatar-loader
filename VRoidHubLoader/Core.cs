@@ -1,4 +1,6 @@
-﻿namespace CustomAvatarLoader;
+﻿using CustomAvatarLoader.Settings;
+
+namespace CustomAvatarLoader;
 
 using CustomAvatarLoader.Helpers;
 using CustomAvatarLoader.Modules;
@@ -13,6 +15,7 @@ public class Core : MelonMod
     protected const string RepositoryName = "YusufOzmen01/desktopmate-custom-avatar-loader";
 
     protected virtual ILogger Logger { get; private set; }
+    protected virtual ISettingsProvider SettingsProvider { get; private set; }
 
     protected virtual IServiceProvider ServiceProvider { get; private set; }
 
@@ -26,6 +29,7 @@ public class Core : MelonMod
 
         Modules = ServiceProvider.GetServices<IModule>();
         Logger = ServiceProvider.GetService<ILogger>();
+        SettingsProvider = ServiceProvider.GetService<ISettingsProvider>();
 
         var versionChecker = new GitHubVersionChecker(RepositoryName, Logger);
         var updater = new Updater(RepositoryName, Logger);
@@ -57,6 +61,7 @@ public class Core : MelonMod
     protected virtual void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton(typeof(MelonLogger.Instance), LoggerInstance);
+        services.AddSingleton(typeof(ISettingsProvider), new MelonLoaderSettings("settings"));
         services.AddScoped(typeof(Logging.ILogger), typeof(MelonLoaderLogger));
         services.AddScoped(typeof(IModule), typeof(VrmLoaderModule));
     }
