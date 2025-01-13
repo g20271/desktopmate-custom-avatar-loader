@@ -95,7 +95,7 @@ public class VrmLoaderModule : IModule
         if (newChara == null)
         {
             Logger.Error("[Chara Loader] Failed to load VRM file: " + path);
-            MessageBox(new IntPtr(0), "Failed to load VRM file! Make sure the VRM file is compatible!", "Error", 0x00000010 /* MB_ICONERROR */);
+            Task.Run(() => { MessageBox(new IntPtr(0), "Failed to load VRM file! Make sure the VRM file is compatible!", "Error", 0x00000010 /* MB_ICONERROR */); });
 
             return false;
         }
