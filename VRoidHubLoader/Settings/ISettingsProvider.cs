@@ -8,7 +8,10 @@ public interface ISettingsProvider
     // module1.setting1
     // module1.setting2
     // module2.setting1
+
     T? Get<T>(string setting);
+
     void Set<T>(string setting, T value);
+
     void SaveSettings();
 }
