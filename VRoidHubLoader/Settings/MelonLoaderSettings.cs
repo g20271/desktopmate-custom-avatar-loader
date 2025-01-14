@@ -11,34 +11,38 @@ public class MelonLoaderSettings : ISettingsProvider
         _defaultCategory = defaultCategory;
     }
 
-    public T? Get<T>(string setting)
+    public T Get<T>(string setting, T defaultValue)
     {
         if (string.IsNullOrEmpty(setting))
         {
-            return default;
+            return defaultValue;
         }
         
         var settingSections = setting.Split(".");
         var category = settingSections.Length > 1 ? settingSections[0] : _defaultCategory;
         var key = settingSections.Length > 1 ? settingSections[1] : settingSections[0];
+
+        var settingsCategory = MelonPreferences.CreateCategory(category);
         
-        return MelonPreferences.CreateCategory(category).CreateEntry<T>(key, default).Value;
+        return settingsCategory.HasEntry(key) ? settingsCategory.GetEntry<T>(key).Value : settingsCategory.CreateEntry(key, defaultValue).Value;
     }
 
-    public T? Set<T>(string setting, T value)
+    public bool Set<T>(string setting, T value)
     {
         if (string.IsNullOrEmpty(setting))
         {
-            return default;
+            return false;
         }
         
         var settingSections = setting.Split(".");
         var category = settingSections.Length > 1 ? settingSections[0] : _defaultCategory;
         var key = settingSections.Length > 1 ? settingSections[1] : settingSections[0];
-        
-        MelonPreferences.CreateCategory(category).CreateEntry<T>(key, default).Value = value;
+        var settingsCategory = MelonPreferences.CreateCategory(category);
 
-        return value;
+        if (settingsCategory.HasEntry(key)) settingsCategory.GetEntry<T>(key).Value = value;
+        else settingsCategory.CreateEntry(key, value);
+
+        return true;
     }
 
     public void SaveSettings()

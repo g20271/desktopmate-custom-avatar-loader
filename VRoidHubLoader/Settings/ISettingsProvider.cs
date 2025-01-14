@@ -9,9 +9,9 @@ public interface ISettingsProvider
     // module1.setting2
     // module2.setting1
 
-    T? Get<T>(string setting);
+    T Get<T>(string setting, T defaultValue);
 
-    T? Set<T>(string setting, T value);
+    bool Set<T>(string setting, T value);
 
     void SaveSettings();
 }

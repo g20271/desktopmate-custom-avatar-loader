@@ -44,9 +44,9 @@ public class VrmLoaderModule : IModule
     {
         if (!init)
         {
-            string vrmPath = SettingsProvider.Get<string>("vrmPath");
+            string vrmPath = SettingsProvider.Get("vrmPath", string.Empty);
             if (GameObject.Find("/CharactersRoot")?.transform?.GetChild(0) != null
-                && vrmPath != string.Empty)
+                && !string.IsNullOrEmpty(vrmPath))
             {
                 LoadCharacter(vrmPath);
             }
