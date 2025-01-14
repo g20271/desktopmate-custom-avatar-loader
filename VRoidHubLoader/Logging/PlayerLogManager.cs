@@ -19,7 +19,7 @@ public class PlayerLogManager
 
     public void ClearLog(string logPath)
     {
-        var disableReadOnly = SettingsProvider.Set<bool>("disable_log_readonly", false);
+        var disableReadOnly = SettingsProvider.Get<bool>("disable_log_readonly");
         SettingsProvider.SaveSettings();
 
         if (File.Exists(logPath))
