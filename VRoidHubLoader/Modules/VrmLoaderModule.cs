@@ -4,9 +4,13 @@ using CustomAvatarLoader.Settings;
 namespace CustomAvatarLoader.Modules;
 
 using CustomAvatarLoader.Helpers;
+using CustomAvatarLoader.Patches;
 using Il2Cpp;
 using MelonLoader;
+using MelonLoader.Utils;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using ILogger = Logging.ILogger;
 
 public class VrmLoaderModule : IModule
@@ -34,10 +38,20 @@ public class VrmLoaderModule : IModule
     private static extern int MessageBox(IntPtr hwnd, String text, String caption, uint type);
     
     protected virtual AsyncHelper AsyncHelper { get; set; }
-     
+
+    public readonly string VrmFolderPath = MelonEnvironment.GameRootDirectory + @"\VRM";
+
     public void OnInitialize()
     {
         AsyncHelper = new AsyncHelper();
+
+        if (!Directory.Exists(VrmFolderPath))
+        {
+            Directory.CreateDirectory(VrmFolderPath);
+            Logger.Debug("[Chara Loader] VRM folder does not exist. Creating one...");
+        }
+
+        ModelPageManagerPatch.InitPatch(Logger, SettingsProvider, this);
     }
 
     public async void OnUpdate()
@@ -58,22 +72,22 @@ public class VrmLoaderModule : IModule
 
         if (Input.GetKeyDown(KeyCode.F4))
         {
-            Logger.Debug($"OnUpdate: VrmLoaderModule F4 pressed");
+            Logger.Debug("OnUpdate: VrmLoaderModule F4 pressed");
 
-            var fileHelper = new FileHelper();
-
-            string path = await fileHelper.OpenFileDialog();
-
-            AsyncHelper.RunOnMainThread(() => {
-                if (!string.IsNullOrEmpty(path) && LoadCharacter(path))
-                {
-                    SettingsProvider.Set("vrmPath", path);
-                    MelonPreferences.Save();
-
-                    Logger.Debug($"OnUpdate: VrmLoaderModule file chosen");
-                }
-            });
+            // MenuManager is a singleton? sweet.
+            if (!MenuManager.Instance.IsOpen)
+            {
+                MelonCoroutines.Start(CoAutoOpenModelPage());
+            }
         }
+    }
+
+    private IEnumerator CoAutoOpenModelPage()
+    {
+        MenuManager.Instance.OpenRootPage();
+        while (MenuManager.Instance.isMoving)
+            yield return null;
+        MenuManager.Instance.OpenPage(MenuManager.Instance.modelPage);
     }
 
     public bool LoadCharacter(string path)
@@ -85,7 +99,8 @@ public class VrmLoaderModule : IModule
             return false;
         }
 
-        var chara = GameObject.Find("/CharactersRoot").transform.GetChild(0).gameObject;
+        var root = GameObject.Find("/CharactersRoot");
+        var chara = root.transform.GetChild(0).gameObject;
         CharaData = chara.GetComponent<CharaData>();
         RuntimeAnimatorController = chara.GetComponent<Animator>().runtimeAnimatorController;
 
@@ -103,7 +118,7 @@ public class VrmLoaderModule : IModule
         Logger.Debug("Old character has been destroyed.");
         Object.Destroy(chara);
 
-        newChara.transform.parent = GameObject.Find("/CharactersRoot").transform;
+        newChara.transform.parent = root.transform;
 
         CharaData newCharaData = newChara.AddComponent<CharaData>();
         CopyCharaData(CharaData, newCharaData);
