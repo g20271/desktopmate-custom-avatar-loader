@@ -423,6 +423,10 @@
 		<Compile Include="Logging\ILogger.cs" />
 		<Compile Include="Logging\MelonLoaderLogger.cs" />
 		<Compile Include="Logging\PlayerLogManager.cs" />
+		<Compile Include="Models\IModelPackageHandler.cs" />
+		<Compile Include="Models\ModelPackage.cs" />
+		<Compile Include="Models\ModelPackageImportException.cs" />
+		<Compile Include="Models\ModelPackageLoader.cs" />
 		<Compile Include="Modules\IModule.cs" />
 		<Compile Include="Modules\VrmLoaderModule.cs" />
 		<Compile Include="Settings\ISettingsProvider.cs" />
