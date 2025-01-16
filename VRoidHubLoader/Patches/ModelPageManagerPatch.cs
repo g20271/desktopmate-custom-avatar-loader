@@ -35,7 +35,11 @@ namespace CustomAvatarLoader.Patches
                 RectTransform buttonRect = button.GetComponent<RectTransform>();
                 buttonRect.sizeDelta = mikuButtonRect.sizeDelta;
                 button.name = name + "_button";
-                button.GetComponentInChildren<Text>().text = name;
+                Text buttonText = button.GetComponentInChildren<Text>();
+                buttonText.text = name;
+                buttonText.fontSize = 20;
+                RectTransform buttonTextRect = buttonText.GetComponent<RectTransform>();
+                buttonTextRect.localScale = new Vector3(0.8f, 0.8f, 0.8f);
                 button.GetComponent<Button>().onClick.AddListener(new Action(() =>
                 {
                     if (LoaderModule.LoadCharacter(path))
