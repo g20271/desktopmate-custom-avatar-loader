@@ -31,7 +31,9 @@ namespace CustomAvatarLoader.Patches
                 string name = file.Split('.')[0];
                 GameObject button = DefaultControls.CreateButton(new DefaultControls.Resources());
                 button.transform.position = new Vector3(0.83f, offset, -1f);
-                button.transform.localScale = new Vector3(1.2f, 1.2f, 1f);
+                RectTransform mikuButtonRect = __instance.mikuButton.GetComponent<RectTransform>();
+                RectTransform buttonRect = button.GetComponent<RectTransform>();
+                buttonRect.sizeDelta = mikuButtonRect.sizeDelta;
                 button.name = name + "_button";
                 button.GetComponentInChildren<Text>().text = name;
                 button.GetComponent<Button>().onClick.AddListener(new Action(() =>
