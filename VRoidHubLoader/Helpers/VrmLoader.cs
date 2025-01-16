@@ -16,6 +16,7 @@ public class VrmLoader
 
     public GameObject LoadVrmIntoScene(string path)
     {
+        _logger.Debug($"Loading VRM Into Scene: \"{path}\"");
         try
         {
             var data = new GlbFileParser(path).Parse();
